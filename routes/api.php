@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReportController; 
 use App\Http\Controllers\ProductUploadController;
 
 Route::post('register', [AuthController::class, 'register']);

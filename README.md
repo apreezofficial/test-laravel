@@ -1,61 +1,537 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📦 Order API Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Overview
+This is a robust and scalable backend API built with Laravel 12 and PHP 8.2, designed for managing orders, products, and user authentication. It leverages Laravel Sanctum for secure API authentication and Eloquent ORM for efficient database interactions, including features for bulk product uploads and comprehensive reporting.
 
-## About Laravel
+## Features
+- **User Authentication & Authorization**: Secure user registration, login, and logout functionalities powered by Laravel Sanctum, supporting distinct user roles.
+- **Order Management**: API endpoints for creating new orders with dynamic pricing based on quantity and applying discounts. Users can view their own orders, while administrators can view all orders.
+- **Product Management**: Full CRUD (Create, Read, Update, Delete) capabilities for products, including unique SKU validation and quantity tracking.
+- **Bulk Product Upload**: Ability to upload products in bulk via Excel files, with built-in validation for data integrity and secure image storage.
+- **Inventory Management**: Automated stock decrement upon order placement and detailed logging of all stock changes through a transaction system.
+- **Reporting**: Specialized reports for identifying low-stock products and a sales summary, providing insights into total revenue, total orders, and top-selling products.
+- **Database Integration**: Utilizes Eloquent ORM with support for various database connections, defaulting to SQLite for easy local setup.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Getting Started
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Installation
+To get this project up and running on your local machine, follow these steps:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1.  **Clone the Repository**:
+    ```bash
+    git clone https://github.com/apreezofficial/test-laravel
+    cd order-api
+    ```
+    
 
-## Learning Laravel
+2.  **Install PHP Dependencies**:
+    ```bash
+    composer install
+    ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3.  **Configure Environment Variables**:
+    ```bash
+    cp .env.example .env
+    ```
+    Then, open the newly created `.env` file and configure your database settings and `APP_KEY`. A default SQLite database is configured, which requires creating an empty file.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+4.  **Generate Application Key**:
+    ```bash
+    php artisan key:generate
+    ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+5.  **Setup Database**:
+    If using SQLite (default in `.env.example`):
+    ```bash
+    touch database/database.sqlite
+    ```
+    Then, run migrations to create the necessary tables:
+    ```bash
+    php artisan migrate
+    ```
 
-## Laravel Sponsors
+6.  **Start the Development Server**:
+    ```bash
+    php artisan serve
+    ```
+    ✅ The API will typically be available at `http://127.0.0.1:8000/api`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Environment Variables
+The following environment variables are required to run the application. Please configure them in your `.env` file:
 
-### Premium Partners
+| Variable             | Description                                          | Example                       |
+| :------------------- | :--------------------------------------------------- | :---------------------------- |
+| `APP_NAME`           | The name of your application.                        | `Laravel Order API`           |
+| `APP_ENV`            | The current application environment.                 | `local`                       |
+| `APP_KEY`            | A unique application key (generated by `key:generate`). | `base64:YOUR_GENERATED_KEY`   |
+| `APP_DEBUG`          | Enable or disable debug mode.                        | `true`                        |
+| `APP_URL`            | The base URL of your application.                    | `http://localhost`            |
+| `DB_CONNECTION`      | Database connection driver.                          | `sqlite` or `mysql`           |
+| `DB_HOST`            | Database host (if using MySQL/PostgreSQL).           | `127.0.0.1`                   |
+| `DB_PORT`            | Database port.                                       | `3306`                        |
+| `DB_DATABASE`        | Database name.                                       | `database/database.sqlite`    |
+| `DB_USERNAME`        | Database username.                                   | `root`                        |
+| `DB_PASSWORD`        | Database password.                                   | `null` (or leave empty)       |
+| `SANCTUM_STATEFUL_DOMAINS` | Domains for stateful API authentication cookies. | `localhost,127.0.0.1`         |
+| `FILESYSTEM_DISK`    | Default filesystem disk for file storage.          | `local` (or `s3`, `public`) |
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## API Documentation
+
+### Base URL
+All API requests should be prefixed with `/api`.
+Example: `http://127.0.0.1:8000/api`
+
+### Endpoints
+
+#### POST /api/register
+Registers a new user account.
+
+**Request**:
+```json
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "password": "strongpassword"
+}
+```
+
+**Response**:
+```json
+{
+  "token": "YOUR_AUTH_TOKEN",
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "role": "user",
+    "updated_at": "2023-01-01T12:00:00.000000Z",
+    "created_at": "2023-01-01T12:00:00.000000Z"
+  }
+}
+```
+
+**Errors**:
+- `422 Unprocessable Content`: If validation fails (e.g., missing fields, invalid email format, duplicate email).
+- `500 Internal Server Error`: For unexpected server issues.
+
+#### POST /api/login
+Authenticates a user and returns an API token.
+
+**Request**:
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "strongpassword"
+}
+```
+
+**Response**:
+```json
+{
+  "token": "YOUR_AUTH_TOKEN",
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "role": "user",
+    "updated_at": "2023-01-01T12:00:00.000000Z",
+    "created_at": "2023-01-01T12:00:00.000000Z"
+  }
+}
+```
+
+**Errors**:
+- `401 Unauthorized`: If credentials are invalid.
+- `422 Unprocessable Content`: If validation fails.
+- `500 Internal Server Error`: For unexpected server issues.
+
+#### POST /api/logout
+Logs out the authenticated user by revoking their current API token. Requires authentication.
+
+**Request**:
+(No body)
+
+**Response**:
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+**Errors**:
+- `401 Unauthorized`: If no valid authentication token is provided.
+
+#### GET /api/orders
+Retrieves a list of orders.
+*   **Users**: Can view their own orders.
+*   **Admins**: Can view all orders.
+
+**Request**:
+(No body)
+
+**Response**:
+```json
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "order_number": "ORD-1672531200123",
+    "status": "pending",
+    "total_amount": "125.00",
+    "created_at": "2023-01-01T12:00:00.000000Z",
+    "updated_at": "2023-01-01T12:00:00.000000Z",
+    "user": {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "role": "user",
+      "created_at": "2023-01-01T12:00:00.000000Z",
+      "updated_at": "2023-01-01T12:00:00.000000Z"
+    },
+    "products": [
+      {
+        "id": 1,
+        "name": "Product A",
+        "sku": "PA-001",
+        "price": "50.00",
+        "quantity": 95,
+        "image_path": "products/PA-001-1672531200.jpg",
+        "created_at": "2023-01-01T11:00:00.000000Z",
+        "updated_at": "2023-01-01T12:00:00.000000Z",
+        "pivot": {
+          "order_id": 1,
+          "product_id": 1,
+          "quantity": 2,
+          "price": "50.00"
+        }
+      }
+    ]
+  }
+]
+```
+
+**Errors**:
+- `401 Unauthorized`: If no valid authentication token is provided.
+
+#### POST /api/orders
+Creates a new order. Requires authentication.
+
+**Request**:
+```json
+{
+  "products": [
+    {
+      "product_id": 1,
+      "quantity": 2
+    },
+    {
+      "product_id": 2,
+      "quantity": 1
+    }
+  ]
+}
+```
+
+**Response**:
+```json
+{
+  "message": "Order placed successfully",
+  "order": {
+    "user_id": 1,
+    "order_number": "ORD-1672531200123",
+    "status": "pending",
+    "total_amount": "125.00",
+    "updated_at": "2023-01-01T12:00:00.000000Z",
+    "created_at": "2023-01-01T12:00:00.000000Z",
+    "id": 1,
+    "products": [
+      {
+        "id": 1,
+        "name": "Product A",
+        "sku": "PA-001",
+        "price": "50.00",
+        "quantity": 95,
+        "image_path": "products/PA-001-1672531200.jpg",
+        "created_at": "2023-01-01T11:00:00.000000Z",
+        "updated_at": "2023-01-01T12:00:00.000000Z",
+        "pivot": {
+          "order_id": 1,
+          "product_id": 1,
+          "quantity": 2,
+          "price": "50.00"
+        }
+      }
+    ]
+  }
+}
+```
+
+**Errors**:
+- `401 Unauthorized`: If no valid authentication token is provided.
+- `422 Unprocessable Content`: If validation fails (e.g., `products` array is empty, invalid `product_id`, `quantity` is less than 1, insufficient stock).
+- `500 Internal Server Error`: For unexpected server issues.
+
+#### POST /api/products/upload
+Uploads products in bulk via an Excel file. Requires authentication (Admin only).
+
+**Request**:
+`Content-Type: multipart/form-data`
+```
+file: [Excel file containing product data]
+```
+The Excel file should have the following headers: `name`, `sku`, `price`, `quantity`, `image_url`.
+
+**Response**:
+```json
+{
+  "message": "Products uploaded successfully!",
+  "valid_products_count": 10,
+  "error_rows": [
+    {
+      "row": 5,
+      "errors": ["The sku has already been taken."]
+    }
+  ]
+}
+```
+
+**Errors**:
+- `401 Unauthorized`: If no valid authentication token or user is not an Admin.
+- `422 Unprocessable Content`: If validation fails (e.g., file not provided, invalid file type, data validation errors within the Excel file).
+- `500 Internal Server Error`: For unexpected server issues.
+
+#### GET /api/products
+Retrieves a list of all products. Requires authentication (Admin only).
+
+**Request**:
+(No body)
+
+**Response**:
+```json
+[
+  {
+    "id": 1,
+    "name": "Product A",
+    "sku": "PA-001",
+    "price": "50.00",
+    "quantity": 100,
+    "image_path": "products/PA-001-1672531200.jpg",
+    "created_at": "2023-01-01T11:00:00.000000Z",
+    "updated_at": "2023-01-01T11:00:00.000000Z"
+  }
+]
+```
+
+**Errors**:
+- `401 Unauthorized`: If no valid authentication token or user is not an Admin.
+
+#### POST /api/products
+Creates a new product. Requires authentication (Admin only).
+
+**Request**:
+```json
+{
+  "name": "New Product X",
+  "sku": "NP-001",
+  "price": 25.99,
+  "quantity": 50,
+  "image_path": "products/NP-001-1672531200.jpg"
+}
+```
+
+**Response**:
+```json
+{
+  "id": 1,
+  "name": "New Product X",
+  "sku": "NP-001",
+  "price": "25.99",
+  "quantity": 50,
+  "image_path": "products/NP-001-1672531200.jpg",
+  "created_at": "2023-01-01T12:00:00.000000Z",
+  "updated_at": "2023-01-01T12:00:00.000000Z"
+}
+```
+
+**Errors**:
+- `401 Unauthorized`: If no valid authentication token or user is not an Admin.
+- `422 Unprocessable Content`: If validation fails (e.g., missing fields, duplicate SKU).
+
+#### GET /api/products/{id}
+Retrieves a specific product by its ID. Requires authentication (Admin only).
+
+**Request**:
+(No body)
+
+**Response**:
+```json
+{
+  "id": 1,
+  "name": "Product A",
+  "sku": "PA-001",
+  "price": "50.00",
+  "quantity": 100,
+  "image_path": "products/PA-001-1672531200.jpg",
+  "created_at": "2023-01-01T11:00:00.000000Z",
+  "updated_at": "2023-01-01T11:00:00.000000Z"
+}
+```
+
+**Errors**:
+- `401 Unauthorized`: If no valid authentication token or user is not an Admin.
+- `404 Not Found`: If the product with the given ID does not exist.
+
+#### PUT /api/products/{id}
+Updates an existing product. Requires authentication (Admin only).
+
+**Request**:
+```json
+{
+  "name": "Updated Product A",
+  "sku": "PA-001-V2",
+  "price": 55.00,
+  "quantity": 110,
+  "image_path": "products/PA-001-V2-1672531200.jpg"
+}
+```
+
+**Response**:
+```json
+{
+  "id": 1,
+  "name": "Updated Product A",
+  "sku": "PA-001-V2",
+  "price": "55.00",
+  "quantity": 110,
+  "image_path": "products/PA-001-V2-1672531200.jpg",
+  "created_at": "2023-01-01T11:00:00.000000Z",
+  "updated_at": "2023-01-01T13:00:00.000000Z"
+}
+```
+
+**Errors**:
+- `401 Unauthorized`: If no valid authentication token or user is not an Admin.
+- `404 Not Found`: If the product with the given ID does not exist.
+- `422 Unprocessable Content`: If validation fails (e.g., duplicate SKU, invalid data).
+
+#### DELETE /api/products/{id}
+Deletes a product. Requires authentication (Admin only).
+*   A product cannot be deleted if it is linked to existing orders.
+
+**Request**:
+(No body)
+
+**Response**:
+`204 No Content` (Successful deletion)
+
+**Errors**:
+- `401 Unauthorized`: If no valid authentication token or user is not an Admin.
+- `404 Not Found`: If the product with the given ID does not exist.
+- `409 Conflict`: If the product is linked to one or more orders.
+
+#### GET /api/reports/low-stock
+Generates a report of products with quantity less than 5. Requires authentication (Admin only).
+
+**Request**:
+(No body)
+
+**Response**:
+```json
+[
+  {
+    "id": 5,
+    "name": "Low Stock Item 1",
+    "sku": "LSI-001",
+    "price": "10.00",
+    "quantity": 2,
+    "image_path": null,
+    "created_at": "2023-01-01T10:00:00.000000Z",
+    "updated_at": "2023-01-01T10:00:00.000000Z"
+  }
+]
+```
+
+**Errors**:
+- `401 Unauthorized`: If no valid authentication token or user is not an Admin.
+
+#### GET /api/reports/sales-summary
+Generates a summary of sales data, including total revenue, total orders, and top 3 selling products. Requires authentication (Admin only).
+
+**Request**:
+(No body)
+
+**Response**:
+```json
+{
+  "total_revenue": "1500.25",
+  "total_orders": 50,
+  "top_3_selling_products": [
+    {
+      "id": 1,
+      "name": "Product A",
+      "sku": "PA-001",
+      "price": "50.00",
+      "quantity": 90,
+      "image_path": "products/PA-001-1672531200.jpg",
+      "created_at": "2023-01-01T11:00:00.000000Z",
+      "updated_at": "2023-01-01T11:00:00.000000Z"
+    },
+    {
+      "id": 3,
+      "name": "Product C",
+      "sku": "PC-003",
+      "price": "75.00",
+      "quantity": 70,
+      "image_path": null,
+      "created_at": "2023-01-01T11:00:00.000000Z",
+      "updated_at": "2023-01-01T11:00:00.000000Z"
+    },
+    {
+      "id": 2,
+      "name": "Product B",
+      "sku": "PB-002",
+      "price": "30.00",
+      "quantity": 65,
+      "image_path": "products/PB-002-1672531200.jpg",
+      "created_at": "2023-01-01T11:00:00.000000Z",
+      "updated_at": "2023-01-01T11:00:00.000000Z"
+    }
+  ]
+}
+```
+
+**Errors**:
+- `401 Unauthorized`: If no valid authentication token or user is not an Admin.
+
+## Usage
+After installation and starting the server:
+
+1.  **Register a User**: Make a `POST` request to `/api/register` with `name`, `email`, and `password`.
+2.  **Login User**: Make a `POST` request to `/api/login` with `email` and `password` to receive an `auth_token`.
+3.  **Authenticated Requests**: Include the `auth_token` in the `Authorization` header of subsequent requests as a Bearer token (e.g., `Authorization: Bearer YOUR_AUTH_TOKEN`).
+4.  **Admin Access**: The initial user registered will have a `role` of 'user'. To test admin-specific routes (Product Management, Reports), you would need to manually update a user's `role` to 'admin' in the database.
+
+## Technologies Used
+
+| Technology           | Description                                             | Link                                                  |
+| :------------------- | :------------------------------------------------------ | :---------------------------------------------------- |
+| Laravel 12           | PHP Framework for web artisans.                         | [https://laravel.com](https://laravel.com)            |
+| PHP 8.2+             | Server-side scripting language.                         | [https://www.php.net](https://www.php.net)            |
+| Laravel Sanctum      | API authentication for SPAs and mobile applications.    | [https://laravel.com/docs/sanctum](https://laravel.com/docs/sanctum) |
+| Eloquent ORM         | Laravel's ActiveRecord implementation for database.     | [https://laravel.com/docs/eloquent](https://laravel.com/docs/eloquent) |
+| Maatwebsite Excel    | Package for importing and exporting Excel files.        | [https://docs.laravel-excel.com](https://docs.laravel-excel.com) |
+| SQLite (Default)     | File-based relational database management system.       | [https://www.sqlite.org](https://www.sqlite.org)      |
+| MySQL (Configurable) | Popular open-source relational database.                | [https://www.mysql.com](https://www.mysql.com)        |
 
 ## Contributing
+🤝 We welcome contributions to enhance this project! To contribute:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+-   **Fork the repository.**
+-   **Create a new branch** for your feature or bug fix.
+-   **Implement your changes**, ensuring they adhere to the project's coding standards.
+-   **Write unit and feature tests** for your new code.
+-   **Submit a pull request** with a clear description of your changes.
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Author Info
+**Precious Adedokun**
+-   Twitter: [https://twitter.com/apcodesphere](https://twitter.com/apcodesphere)
